@@ -77,7 +77,7 @@ def is_valid(num, row, col, board):
 
 def find_solution(board):
     """
-    Finds solution for the given sudoku board
+    Finds solution for the given sudoku board using recursion
     :param board: Sudoku board to solve
     :return: Returns True if a valid solution was found.
     Returns false if no solution was found.
@@ -116,6 +116,88 @@ def find_solution(board):
         return False
 
 
+def find_solution_dynamic(board):
+    """
+    Finds solution for the given sudoku board using a stack
+    :param board: Sudoku board to solve
+    :return: Returns True if a valid solution was found.
+    Returns false if no solution was found.
+    """
 
+    # Initalize a stack with coordinates of empty cells
+    stack = [[r, c, 0] for r in range(0, 9) for c in range(0, 9) if board[r][c] == 0]
+    num_empty = len(stack)
+
+    # Return if there are no empty cells
+    if num_empty == 0:
+        return True
+
+    # Indices of row, col and intermediate value within stack items
+    ROW = 0
+    COL = 1
+    NUM = 2
+
+    # Status of the sudoku board
+    solved = False
+
+    # Index of the head of the stack
+    stack_index  = 0
+    try:
+        while not solved:
+
+            # Get the next empty cell
+            row, col = stack[stack_index][ROW], stack[stack_index][COL]
+
+            # Start testing numbers greater than the last value stored at the empty cell
+            min = stack[stack_index][NUM] + 1
+            for num in range(min, 10):
+
+                # Check whether the number is valid for the current sudoku baard
+                if is_valid(num, row, col, board):
+
+                    # Update the empty cell
+                    board[row][col] = num
+
+                    # Update stack with the latest value at the empty cell
+                    stack[stack_index][NUM] = num
+
+                    # Increment stack head
+                    stack_index += 1
+
+                    if stack_index == num_empty:
+                        # If all empty cells have been filled,
+                        # Success!
+                        return True
+
+                    # Go back to while loop to solve the board
+                    break
+            else:
+                # All numbers from 1 to 9 are invalid for the current empty cell
+
+                # Reset current empty cell
+                board[row][col] = 0
+
+                # Reset the latest value stored in the stack
+                stack[stack_index][NUM] = 0
+
+                # Decrement stack head
+                stack_index -= 1
+
+                if stack_index < 0:
+                    # No combination of numbers could solve the board
+                    # FAIL
+                    return False
+                pass
+            pass
+
+    except Exception as ex:
+
+        print("stack_index = {}, stack_size = {}". format(stack_index, len(stack)))
+        #print_board(board)
+        raise ex
+
+
+
+    pass
 
 
